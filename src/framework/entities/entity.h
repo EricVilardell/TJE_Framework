@@ -13,7 +13,6 @@ public:
 	virtual ~Entity() {}; 	// Destructor
 
 	std::string name;
-
 	Matrix44 model;
 
 	Entity* parent = nullptr;
