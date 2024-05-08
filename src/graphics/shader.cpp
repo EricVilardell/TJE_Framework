@@ -564,7 +564,12 @@ int Shader::getUniformLocation(const char* varname)
 void Shader::setTexture(const char* varname, Texture* tex, int slot)
 {
 	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(tex->texture_type, tex->texture_id);
+	if (tex == nullptr) {
+		tex = Texture::Get("data/textures/texture.tga");
+	}
+	else {
+		glBindTexture(tex->texture_type, tex->texture_id);
+	}
 	setUniform1(varname, slot);
 	glActiveTexture(GL_TEXTURE0 + slot);
 }
