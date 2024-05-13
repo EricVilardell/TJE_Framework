@@ -10,8 +10,14 @@ World::World()
 	int window_width = Game::instance->window_width;
 	int window_height = Game::instance->window_height;
 
-	Material player_material;
-	player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+	//Material player_material;
+	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
+	player = new EntityPlayer();
+	player->material.diffuse = new Texture();
+	player->mesh = Mesh::Get("data/charmander/004 - Charmander.obj");
+	player->material.diffuse = Texture::Get("data/charmander/004 - Charmander.mtl");
+	player->material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+
 
 	Material landscape_cubemap;
 	landscape_cubemap.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
@@ -25,12 +31,6 @@ World::World()
 		"data/textures/skybox/nz.png"
 		});
 	skybox = new EntityMesh(Mesh::Get("data/meshes/cubemap.ASE"), landscape_cubemap, "landscape");
-	/*skybox = new EntityMesh();
-	skybox->mesh = Mesh::Get("data/meshes/cubemap.ASE");
-	skybox->material = landscape_cubemap;
-	skybox->name = "landscape";
-	*/
-	//EntityMesh* player;
 	parseScene("data/myscene.scene");
 
 }
@@ -40,21 +40,57 @@ World::World()
 
 void World::render()
 {
-	Camera* current_camera = Camera::current;
 	glDisable(GL_DEPTH_TEST);
 	skybox->render(current_camera);
 	glEnable(GL_DEPTH_TEST);
 
-	//player->render(camera);
-	drawGrid();
+	player->render(current_camera);
+	//drawGrid();
 
 	root.render(current_camera);
-	
 }
 
 void World::update(float seconds_elapsed)
 {
+	if (free_camera) {
+		float speed = seconds_elapsed * mouse_speed; //the speed is defined by the seconds_elapsed so it goes constant
 
+		// Example
+
+		// Mouse input to rotate the cam
+		if (Input::isMousePressed(SDL_BUTTON_LEFT)) //is left button pressed?
+		{
+			current_camera->rotate(Input::mouse_delta.x * 0.0005f, Vector3(0.0f, -1.0f, 0.0f));
+			current_camera->rotate(Input::mouse_delta.y * 0.0005f, current_camera->getLocalVector(Vector3(-1.0f, 0.0f, 0.0f)));
+		}
+
+		// Async input to move the camera around
+		if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) speed *= 10; //move faster with left shift
+		if (Input::isKeyPressed(SDL_SCANCODE_W)) current_camera->move(Vector3(0.0f, 0.0f, 1.0f) * speed);
+		if (Input::isKeyPressed(SDL_SCANCODE_S)) current_camera->move(Vector3(0.0f, 0.0f, -1.0f) * speed);
+		if (Input::isKeyPressed(SDL_SCANCODE_A)) current_camera->move(Vector3(1.0f, 0.0f, 0.0f) * speed);
+		if (Input::isKeyPressed(SDL_SCANCODE_D)) current_camera->move(Vector3(-1.0f, 0.0f, 0.0f) * speed);
+	}
+	else {
+		camera_yaw = camera_yaw - Input::mouse_delta.x * 0.005;
+		camera_pitch = camera_pitch - Input::mouse_delta.y * 0.005;
+		Matrix44 mYaw;
+		mYaw.setRotation(camera_yaw, Vector3(0, 1, 0));
+		Matrix44 mPitch;
+		mPitch.setRotation(camera_pitch, Vector3(-1, 0, 0));
+		Matrix44 finalrotation = (mPitch * mYaw);
+		Vector3 front = finalrotation.frontVector().normalize();
+		Vector3 eye;
+		Vector3 center;
+		float orbit_dist = 5.f;
+		eye = player->model.getTranslation() - front * orbit_dist;
+		center = player->model.getTranslation() + Vector3(0.f, 0.1f, 0.0f);
+
+		current_camera->lookAt(eye, center, Vector3(0, 1, 0));
+
+	}
+	player->update(seconds_elapsed);
+	root.update(seconds_elapsed);
 }
 
 void World::addEntity(Entity* entity)

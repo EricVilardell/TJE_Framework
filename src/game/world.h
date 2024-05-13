@@ -1,28 +1,8 @@
-/*#pragma once
-#include "framework/entities/entityMesh.h"
-#include "game.h"
-#include <iostream>
-#include <fstream>
-
-class World {
-public:
-	static World* instance;
-
-	Camera* camera;
-
-	World() {}; 			// Constructor
-	virtual ~World() {};
-
-	void render();
-	void update(float seconds_elapsed);
-
-	void addEntity(Entity* entity);
-	void removeEntity(Entity* entity);
-
-}; */
-
 #pragma once
 #include "framework/entities/entityMesh.h"
+#include "game.h"
+#include "framework/entities/entityMesh.h"
+#include "framework/entities/entityPlayer.h"
 #include "game.h"
 #include "graphics/material.h"
 #include <iostream>
@@ -38,13 +18,14 @@ public:
 		return instance;
 	}
 	EntityMesh* skybox;
-	EntityMesh* player = nullptr;
+	EntityPlayer* player;
 	Entity root;
+	Camera* current_camera = Game::instance->camera;
 	float camera_yaw = 0.f;
 	float camera_pitch = 0.f;
 	float camera_speed = 2.0f;
-	float mouse_speed = 0.5f;
-	bool free_camera = true;
+	float mouse_speed = 100.f;
+	bool free_camera = false;
 	World(); 			// Constructor
 
 	void render();

@@ -53,7 +53,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 //what to do when the image has to be draw
 void Game::render(void)
 {
-	
+
 	// Set the clear color (the background color)
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
