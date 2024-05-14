@@ -8,8 +8,38 @@ EntityPlayer::EntityPlayer()
 
 void EntityPlayer::render(Camera* camera)
 {
-
 	EntityMesh::render(camera);
+
+	Shader* shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+	Mesh* sphere_wall = Mesh::Get("data/meshes/sphere.obj");
+	Mesh* sphere_feet = Mesh::Get("data/meshes/sphere.obj");
+	Matrix44 m = model;
+	Matrix44 m1 = model;
+
+	shader->enable();
+	// esfera cuerpo gorda
+	m.translate(0.0f, 1.f, 0.0f);
+	m.scale(0.7f, 0.5f, 0.5f);
+
+	shader->setUniform("u_color", Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	shader->setUniform("u_model", m);
+
+	sphere_wall->render(GL_LINES);
+
+	//Esfera pies pequeña
+	m1.translate(0.0f, 0.2f, 0.0f);
+	m1.scale(0.2f, 0.2f, 0.2f);
+
+	shader->setUniform("u_color", Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+	shader->setUniform("u_model", m1);
+
+	sphere_feet->render(GL_LINES);
+
+
+	shader->disable();
+	
 }
 
 void EntityPlayer::update(float delta_time)

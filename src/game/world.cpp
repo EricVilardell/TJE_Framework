@@ -45,9 +45,11 @@ void World::render()
 	glEnable(GL_DEPTH_TEST);
 
 	player->render(current_camera);
-	//drawGrid();
+	drawGrid();
 
 	root.render(current_camera);
+
+
 }
 
 void World::update(float seconds_elapsed)
@@ -74,19 +76,25 @@ void World::update(float seconds_elapsed)
 	else {
 		camera_yaw = camera_yaw - Input::mouse_delta.x * 0.005;
 		camera_pitch = camera_pitch - Input::mouse_delta.y * 0.005;
+
 		Matrix44 mYaw;
 		mYaw.setRotation(camera_yaw, Vector3(0, 1, 0));
+
 		Matrix44 mPitch;
 		mPitch.setRotation(camera_pitch, Vector3(-1, 0, 0));
+
 		Matrix44 finalrotation = (mPitch * mYaw);
 		Vector3 front = finalrotation.frontVector().normalize();
 		Vector3 eye;
 		Vector3 center;
+
 		float orbit_dist = 5.f;
 		eye = player->model.getTranslation() - front * orbit_dist;
 		center = player->model.getTranslation() + Vector3(0.f, 0.1f, 0.0f);
 
 		current_camera->lookAt(eye, center, Vector3(0, 1, 0));
+
+
 
 	}
 	player->update(seconds_elapsed);
@@ -192,3 +200,4 @@ bool World::parseScene(const char* filename)
 	std::cout << "Scene [OK]" << " Meshes added: " << mesh_count << std::endl;
 	return true;
 }
+
