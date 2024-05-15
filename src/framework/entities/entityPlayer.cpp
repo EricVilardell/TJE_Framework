@@ -19,7 +19,7 @@ void EntityPlayer::render(Camera* camera)
 	shader->enable();
 	// esfera cuerpo gorda
 	m.translate(0.0f, 1.f, 0.0f);
-	m.scale(0.7f, 0.5f, 0.5f);
+	m.scale(0.6f, 0.6f, 0.6f);
 
 	shader->setUniform("u_color", Vector4(0.0f, 1.0f, 0.0f, 1.0f));
 	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
@@ -54,6 +54,7 @@ void EntityPlayer::update(float delta_time)
 	Vector3 position = model.getTranslation();
 
 	Vector3 move_dir;
+	bool is_grounded = true;
 
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) {
 		move_dir += front;
@@ -70,6 +71,14 @@ void EntityPlayer::update(float delta_time)
 	if (Input::isKeyPressed(SDL_SCANCODE_D)) {
 		move_dir -= right;
 	}
+
+	if (!is_grounded) {
+		velocity.y -= 9.8f * delta_time;
+	}
+	else if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)){
+		velocity.y = 2.0f;
+	}
+
 	float speed_mult = 1.5f;
 
 	move_dir.normalize();

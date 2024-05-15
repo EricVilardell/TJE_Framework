@@ -15,7 +15,7 @@ World::World()
 	player = new EntityPlayer();
 	player->material.diffuse = new Texture();
 	player->mesh = Mesh::Get("data/charmander/004 - Charmander.obj");
-	player->material.diffuse = Texture::Get("data/charmander/004 - Charmander.mtl");
+	//player->material.diffuse = Texture::Get("data/charmander/004 - Charmander.mtl");
 	player->material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 
 
@@ -23,12 +23,12 @@ World::World()
 	landscape_cubemap.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
 	landscape_cubemap.diffuse = new Texture();
 	landscape_cubemap.diffuse->loadCubemap("landscape", {
-		"data/textures/skybox/px.png",
-		"data/textures/skybox/nx.png",
-		"data/textures/skybox/ny.png",
-		"data/textures/skybox/py.png",
-		"data/textures/skybox/pz.png",
-		"data/textures/skybox/nz.png"
+		"data/textures/skybox2/px.png",
+		"data/textures/skybox2/nx.png",
+		"data/textures/skybox2/ny.png",
+		"data/textures/skybox2/py.png",
+		"data/textures/skybox2/pz.png",
+		"data/textures/skybox2/nz.png"
 		});
 	skybox = new EntityMesh(Mesh::Get("data/meshes/cubemap.ASE"), landscape_cubemap, "landscape");
 	parseScene("data/myscene.scene");
@@ -74,8 +74,10 @@ void World::update(float seconds_elapsed)
 		if (Input::isKeyPressed(SDL_SCANCODE_D)) current_camera->move(Vector3(-1.0f, 0.0f, 0.0f) * speed);
 	}
 	else {
-		camera_yaw = camera_yaw - Input::mouse_delta.x * 0.005;
-		camera_pitch = camera_pitch - Input::mouse_delta.y * 0.005;
+		camera_yaw = camera_yaw - Input::mouse_delta.x * seconds_elapsed;
+		camera_pitch = camera_pitch - Input::mouse_delta.y * seconds_elapsed;
+
+		camera_pitch = clamp(camera_pitch, -M_PI * 0.4f, M_PI * 0.4f);
 
 		Matrix44 mYaw;
 		mYaw.setRotation(camera_yaw, Vector3(0, 1, 0));
@@ -93,8 +95,7 @@ void World::update(float seconds_elapsed)
 		center = player->model.getTranslation() + Vector3(0.f, 0.1f, 0.0f);
 
 		current_camera->lookAt(eye, center, Vector3(0, 1, 0));
-
-
+		skybox->model = player->model;
 
 	}
 	player->update(seconds_elapsed);

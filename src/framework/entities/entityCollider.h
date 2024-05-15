@@ -31,6 +31,6 @@ public:
 
 	// New methods
 	//bool testCollision(...);
-	void getCollision(const Vector3& position, std::vector<sCollisionData>& collision, std::vector<sCollisionData>& ground_collision);
+	bool checkPlayerCollisions(const Vector3& target_pos, std::vector<sCollisionData>& ground_collisions, std::vector<sCollisionData>& wall_collision);
 
 };
