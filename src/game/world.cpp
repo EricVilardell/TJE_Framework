@@ -18,6 +18,10 @@ World::World()
 	//player->material.diffuse = Texture::Get("data/charmander/004 - Charmander.mtl");
 	player->material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 
+	//subir el player como mesh ahora, no como obj, y subir un shader que no se sube solo ahora.
+	//nuevo boolean isAnimated en entity_mesh
+	//classe animator meterla en update en un if del isAnimated, con deltaTime, en el entity_mesh
+
 
 	Material landscape_cubemap;
 	landscape_cubemap.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
@@ -94,6 +98,13 @@ void World::update(float seconds_elapsed)
 		eye = player->model.getTranslation() - front * orbit_dist;
 		center = player->model.getTranslation() + Vector3(0.f, 0.1f, 0.0f);
 
+		Vector3 dir = eye - center;
+		sCollisionData data = World::get_instance()->raycast(center, dir.normalize(), eCollisionFilter::ALL, dir.length());
+		
+		if (data.collided) {
+			eye = data.colPoint;
+		}
+
 		current_camera->lookAt(eye, center, Vector3(0, 1, 0));
 		skybox->model = player->model;
 
@@ -111,6 +122,61 @@ void World::removeEntity(Entity* entity)
 {
 	entities_to_destroy.push_back(entity);
 }
+
+void World::get_collisions(const Vector3& position, std::vector<sCollisionData>& ground_collisions, std::vector<sCollisionData>& wall_collisions)
+{
+	for (auto e : root.children)
+	{
+		EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
+		if (ec == nullptr) {
+			continue;
+		}
+		ec->checkPlayerCollisions(position, ground_collisions, wall_collisions);
+	}
+}
+
+sCollisionData World::raycast(const Vector3& origin, const Vector3& direction, int layer, float max_ray_dist)
+{
+	sCollisionData data;
+
+	for (auto e : root.children)
+	{
+		EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
+		if (ec == nullptr/* || !(ec->getLayer() & layer)*/) {
+			continue;
+		}
+
+		Vector3 col_point;
+		Vector3 col_normal;
+
+		if (!ec->mesh->testRayCollision(ec->model, origin, direction, col_point, col_normal, max_ray_dist)) {
+			continue;
+		}
+
+		data.collided = true;
+
+		float new_distance = (col_point - origin).length();
+		if (new_distance < data.distance) {
+			data.colPoint = col_point;
+			data.colNormal = col_normal;
+			data.distance = new_distance;
+			data.collided = ec;
+		}
+	}
+	return data;
+}
+/*
+void World::addWayPointFromScreenPos(const Vector2& coord)
+{
+	Camera* camera = Camera::current;
+
+	Vector3 ray_origin = camera->eye;
+	Vector3 ray_direction = camera->getRayDirection(Input::mouse_position.x, Input::mouse_position.y, Game::instance->window_width, Game::instance->window_height);
+
+	sCollisionData data = World::get_instance()->raycast(ray_origin, ray_direction);
+
+	waypoints.push_back(data.colPoint);
+}*/
 
 bool World::parseScene(const char* filename)
 {

@@ -2,7 +2,7 @@
 #include "entityMesh.h"
 
 
-enum {
+enum eCollisionFilter {
 	NONE = 0,
 	FLOOR = 1 << 0,
 	WALL = 1 << 1,
@@ -15,15 +15,17 @@ enum {
 };
 
 
+struct sCollisionData {
+	Vector3 colPoint;
+	Vector3 colNormal;
+	bool collided;
+	float distance;
+};
+
+
 class EntityCollider : public EntityMesh {
 
 public:
-
-	struct sCollisionData {
-		Vector3 colPoint;
-		Vector3 colNormal;
-	};
-
 
 	bool is_dynamic = false;
 
