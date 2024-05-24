@@ -13,6 +13,7 @@ World::World()
 	//Material player_material;
 	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
 	player = new EntityPlayer();
+	player->model.setTranslation(0.f, 15.f, 0.f);
 	player->material.diffuse = new Texture();
 	player->mesh = Mesh::Get("data/charmander/004 - Charmander.obj");
 	//player->material.diffuse = Texture::Get("data/charmander/004 - Charmander.mtl");
@@ -36,11 +37,7 @@ World::World()
 		});
 	skybox = new EntityMesh(Mesh::Get("data/meshes/cubemap.ASE"), landscape_cubemap, "landscape");
 	parseScene("data/myscene.scene");
-
 }
-
-
-
 
 void World::render()
 {
@@ -78,6 +75,9 @@ void World::update(float seconds_elapsed)
 		if (Input::isKeyPressed(SDL_SCANCODE_D)) current_camera->move(Vector3(-1.0f, 0.0f, 0.0f) * speed);
 	}
 	else {
+
+		player->update(seconds_elapsed);
+
 		camera_yaw = camera_yaw - Input::mouse_delta.x * seconds_elapsed;
 		camera_pitch = camera_pitch - Input::mouse_delta.y * seconds_elapsed;
 
@@ -97,19 +97,50 @@ void World::update(float seconds_elapsed)
 		float orbit_dist = 5.f;
 		eye = player->model.getTranslation() - front * orbit_dist;
 		center = player->model.getTranslation() + Vector3(0.f, 0.1f, 0.0f);
-
-		Vector3 dir = eye - center;
-		sCollisionData data = World::get_instance()->raycast(center, dir.normalize(), eCollisionFilter::ALL, dir.length());
 		
-		if (data.collided) {
-			eye = data.colPoint;
-		}
+		Vector3 dir = eye - center;
+
+		std::vector<sCollisionData> wall_collisions;
+		CheckPlayerCollision(player->model.getTranslation(), wall_collisions);
 
 		current_camera->lookAt(eye, center, Vector3(0, 1, 0));
+
+		//sCollisionData data = World::get_instance()->raycast(center, dir.normalize(), eCollisionFilter::ALL, dir.length());
+		
+		//if (data.collided) {
+			//eye = data.colPoint;
+		//}
+		//std::vector<sCollisionData> ground_collisions;
+		/*for (auto e : root.children) {
+			EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
+			if (!ec) {
+				continue;
+			}
+			ec->checkPlayerCollisions(player->model.getTranslation()+ player->velocity*seconds_elapsed,ground_collisions,wall_collisions);
+		}*/
+
+		/*
+		float max_ray_dist = 5.f;
+		Vector3 colPoint, colNormal;
+		for (auto e : root.children) {
+			EntityMesh* em = dynamic_cast<EntityMesh*>(e);
+			if (!em) {
+				continue;
+			}
+			Mesh* mesh = em->mesh;
+			if (mesh->testRayCollision(em->model, center, Vector3(0, -1, 0), colPoint, colNormal, max_ray_dist, false)) {
+				std::cout << "collision" << std::endl;
+				player->is_grounded = true;
+			}
+			else {
+				player->is_grounded = false;
+			}
+		}
+		*/
 		skybox->model = player->model;
 
 	}
-	player->update(seconds_elapsed);
+
 	root.update(seconds_elapsed);
 }
 
@@ -177,6 +208,30 @@ void World::addWayPointFromScreenPos(const Vector2& coord)
 
 	waypoints.push_back(data.colPoint);
 }*/
+
+bool World::CheckPlayerCollision(const Vector3& target_pos, std::vector<sCollisionData>& collisions)
+{
+	//Vector3 Player_position = player->model.getTranslation();
+	Vector3 character_center = target_pos + Vector3(0.f, 1.0f, 0.f);
+	float radius = 0.6f;
+
+	Vector3 colPoint;
+	Vector3 colNormal;
+
+	for (auto e : root.children) {
+		EntityMesh* em = dynamic_cast<EntityMesh*>(e);
+		if (!em) {
+			continue;
+		}
+		Mesh* mesh = em->mesh;
+		if (mesh->testSphereCollision(e->model, character_center, radius, colPoint, colNormal)) {
+
+			std::cout << "collision" << std::endl;
+			collisions.push_back({ colPoint,colNormal.normalize() });
+		}
+	}
+	return !collisions.empty();
+}
 
 bool World::parseScene(const char* filename)
 {

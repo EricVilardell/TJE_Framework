@@ -54,7 +54,7 @@ void EntityPlayer::update(float delta_time)
 	Vector3 position = model.getTranslation();
 
 	Vector3 move_dir;
-	bool is_grounded = true;
+	//bool is_grounded = false;
 
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) {
 		move_dir += front;
@@ -72,11 +72,17 @@ void EntityPlayer::update(float delta_time)
 		move_dir -= right;
 	}
 
+
+
 	if (!is_grounded) {
-		velocity.y -= 9.8f * delta_time;
+		//velocity.y -= 0.5f * delta_time;
 	}
-	else if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)){
-		velocity.y = 2.0f;
+	else {
+		velocity.y = 0.0;
+
+		if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+			velocity.y = 2.0f;
+		}
 	}
 
 	float speed_mult = 1.5f;

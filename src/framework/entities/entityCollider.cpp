@@ -10,7 +10,7 @@ bool EntityCollider::checkPlayerCollisions(const Vector3& target_pos, std::vecto
     //second ball, the one on the floor
     Vector3 center2 = target_pos + Vector3(0.0f, 0.2f, 0.0f);
     float sphereRadius2 = 0.2f;
-
+    
     // For each collider entity “e” in root:
 
     if (mesh->testSphereCollision(model, center, sphereRadius, colPoint, colNormal)) {
@@ -19,6 +19,8 @@ bool EntityCollider::checkPlayerCollisions(const Vector3& target_pos, std::vecto
     // End loop
 
     if (mesh->testSphereCollision(model, center2, sphereRadius2, colPoint, colNormal)) {
+        std::cout << "collision" << std::endl;
+
         wall_collisions.push_back({ colPoint, colNormal.normalize() });
     }
 
