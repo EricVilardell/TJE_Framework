@@ -52,7 +52,6 @@ void EntityPlayer::update(float delta_time)
 	Vector3 right = mYaw.rightVector();
 
 	Vector3 position = model.getTranslation();
-
 	Vector3 move_dir;
 	//bool is_grounded = false;
 
@@ -73,31 +72,53 @@ void EntityPlayer::update(float delta_time)
 	}
 
 
+	
+		float speed_mult = 1.5f;
 
-	if (!is_grounded) {
-		//velocity.y -= 0.5f * delta_time;
-	}
-	else {
-		velocity.y = 0.0;
+		//move_dir.normalize();
+		move_dir *= speed_mult;
 
-		if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-			velocity.y = 2.0f;
+		if (is_grounded) {
+			if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+				velocity.y = 10.0;
+				is_grounded = false;
+			}
 		}
+		else {
+			velocity.y -= 9.8 * delta_time;
+		}
+
+		// METER EESTO EN UNA FUNCION DE PLAYER
+		float max_ray_dist = 1.3f;
+		Vector3 colPoint, colNormal;
+		Vector3 center = model.getTranslation() + Vector3(0.f, 1.0f, 0.f);
+		for (auto e : World::get_instance()->root.children) {
+			EntityMesh* em = dynamic_cast<EntityMesh*>(e);
+			if (!em) {
+				continue;
+			}
+			Mesh* mesh = em->mesh;
+			if (mesh->testRayCollision(em->model, center, Vector3(0, -1, 0), colPoint, colNormal, max_ray_dist, false)) {
+				is_grounded = true;
+
+				break;
+			}
+			else {
+				is_grounded = false;
+			}
+		}
+		
+
+		velocity += move_dir;
+
+
+		position += velocity * delta_time;
+
+		velocity.x *= 0.90f;
+		velocity.z *= 0.90f;
+
+		model.setTranslation(position);
+		model.rotate(camera_yaw, Vector3(0, 1, 0));
+
+		EntityMesh::update(delta_time);
 	}
-
-	float speed_mult = 1.5f;
-
-	move_dir.normalize();
-	move_dir *= speed_mult;
-	velocity += move_dir;
-
-	position += velocity * delta_time;
-
-	velocity.x *= 0.90f;
-	velocity.z *= 0.90f;
-
-	model.setTranslation(position);
-	model.rotate(camera_yaw, Vector3(0, 1, 0));
-
-	EntityMesh::update(delta_time);
-}

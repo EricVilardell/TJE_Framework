@@ -39,6 +39,5 @@ public:
 	void get_collisions(const Vector3& position, std::vector<sCollisionData>& collision_ground, std::vector<sCollisionData>& collision_wall);
 	void addWayPointFromScreenPos(const Vector2& coord);
 	bool parseScene(const char* filename);
-	bool CheckPlayerCollision(const Vector3& target_pos, std::vector<sCollisionData>& collisions);
-
+	bool CheckPlayerCollision(const Vector3& target_pos, std::vector<sCollisionData>& collisions, float radius);
 };
