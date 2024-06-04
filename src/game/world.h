@@ -24,6 +24,7 @@ public:
 	Camera* current_camera = Game::instance->camera;
 	float camera_yaw = 0.f;
 	float camera_pitch = 0.f;
+	float pepito = 0;
 	float camera_speed = 2.0f;
 	float mouse_speed = 100.f;
 	bool free_camera = false;

@@ -14,6 +14,7 @@
 #include "framework/camera.h"
 #include "framework/utils.h"
 #include "framework/input.h"
+#include "framework/audio.h"
 #include "game/game.h"
 
 #include <iostream> //to output
@@ -178,6 +179,10 @@ void mainLoop()
 int main(int argc, char **argv)
 {
 	std::cout << "Initiating game..." << std::endl;
+	if (!Audio::Init()) {
+		std::cerr << "Failed to initialize audio system." << std::endl;
+		return -1;
+	}
 
 	//prepare SDL
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -204,6 +209,6 @@ int main(int argc, char **argv)
 	mainLoop();
 
 	//save state and free memory
-
+	Audio::Destroy();
 	return 0;
 }

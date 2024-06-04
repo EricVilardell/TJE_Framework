@@ -72,11 +72,37 @@ void Game::render(void)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 
+	//// Create model matrix for cube
+	//Matrix44 m;
+	//m.rotate(angle*DEG2RAD, Vector3(0.0f, 1.0f, 0.0f));
+
+	//if(shader)
+	//{
+	//	// Enable shader
+	//	shader->enable();
+
+	//	// Upload uniforms
+	//	shader->setUniform("u_color", Vector4(1,1,1,1));
+	//	shader->setUniform("u_viewprojection", camera->viewprojection_matrix );
+	//	shader->setUniform("u_texture", texture, 0);
+	//	shader->setUniform("u_model", m);
+	//	shader->setUniform("u_time", time);
+
+	//	// Do the draw call
+	//	mesh->render( GL_TRIANGLES );
+
+	//	// Disable shader
+	//	shader->disable();
+	//}
+
+	// Draw the floor grid
+	//drawGrid();
+
 	currentStage->render();
 
 	// Render the FPS, Draw Calls, etc
 	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
-
+	drawText(20, 20, std::to_string(World::get_instance()->player->points), Vector3(2, 2, 2), 4);
 	// Swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);
 }
@@ -85,10 +111,10 @@ void Game::update(double seconds_elapsed)
 {
 	//World::get_instance()->update(seconds_elapsed);
 	currentStage->update(seconds_elapsed);
-	if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) //if key down
+	if (Input::wasKeyPressed(SDL_SCANCODE_R)) //if key down
 	{
 		if (currentStage == intro_stage) {
-			currentStage = play_stage;
+			moveToStage(play_stage);
 		}
 	}
 
@@ -151,4 +177,11 @@ void Game::onResize(int width, int height)
 	camera->aspect = width / (float)height;
 	window_width = width;
 	window_height = height;
+}
+
+void Game::moveToStage(Stage* stage)
+{
+	currentStage->onExit();
+	currentStage = stage;
+	currentStage->onEnter();
 }

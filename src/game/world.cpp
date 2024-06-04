@@ -6,14 +6,13 @@ World* World::instance = nullptr;
 
 World::World()
 {
-
 	int window_width = Game::instance->window_width;
 	int window_height = Game::instance->window_height;
 
 	//Material player_material;
 	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
 	player = new EntityPlayer();
-	player->model.setTranslation(0.f, 100.f, 0.f);
+	player->model.setTranslation(0.f, 40.f, 0.f);
 	player->material.diffuse = new Texture();
 	player->mesh = Mesh::Get("data/charmander/004 - Charmander.obj");
 	//player->material.diffuse = Texture::Get("data/charmander/004 - Charmander.mtl");
@@ -77,11 +76,31 @@ void World::update(float seconds_elapsed)
 	else {
 
 
+		if (Input::isKeyPressed(SDL_SCANCODE_A)) {
+			camera_yaw = camera_yaw - 2.f * seconds_elapsed;
 
-		camera_yaw = camera_yaw - Input::mouse_delta.x * seconds_elapsed;
+		}
+
+		if (Input::isKeyPressed(SDL_SCANCODE_D)) {
+			camera_yaw = camera_yaw + 2.f * seconds_elapsed;
+
+		}
+		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
+			pepito = pepito - 4.f * seconds_elapsed;
+
+		}
+
+		if (Input::isKeyPressed(SDL_SCANCODE_S)) {
+			pepito = pepito + 4.f * seconds_elapsed;
+
+		}
+
+		//camera_yaw = camera_yaw - player->velocity.z * seconds_elapsed;
 		camera_pitch = camera_pitch - Input::mouse_delta.y * seconds_elapsed;
-
 		camera_pitch = clamp(camera_pitch, -M_PI * 0.4f, M_PI * 0.4f);
+
+
+
 
 		Matrix44 mYaw;
 		mYaw.setRotation(camera_yaw, Vector3(0, 1, 0));
@@ -99,11 +118,6 @@ void World::update(float seconds_elapsed)
 		center = player->model.getTranslation() + Vector3(0.f, 0.1f, 0.0f);
 
 		Vector3 dir = eye - center;
-
-		std::vector<sCollisionData> wall_collisions;
-		std::vector<sCollisionData> ground_collisions;
-		CheckPlayerCollision(player->model.getTranslation(), ground_collisions, 0.2f);
-		CheckPlayerCollision(player->model.getTranslation(), wall_collisions, 0.6f);
 		player->update(seconds_elapsed);
 		current_camera->lookAt(eye, center, Vector3(0, 1, 0));
 		skybox->model = player->model;
@@ -164,55 +178,6 @@ sCollisionData World::raycast(const Vector3& origin, const Vector3& direction, i
 		}
 	}
 	return data;
-}
-/*
-void World::addWayPointFromScreenPos(const Vector2& coord)
-{
-	Camera* camera = Camera::current;
-
-	Vector3 ray_origin = camera->eye;
-	Vector3 ray_direction = camera->getRayDirection(Input::mouse_position.x, Input::mouse_position.y, Game::instance->window_width, Game::instance->window_height);
-
-	sCollisionData data = World::get_instance()->raycast(ray_origin, ray_direction);
-
-	waypoints.push_back(data.colPoint);
-}*/
-
-bool World::CheckPlayerCollision(const Vector3& target_pos, std::vector<sCollisionData>& collisions, float radius)
-{
-	//esto es horrible
-	Vector3 character_center;
-	if (radius == 0.6) {
-		character_center = target_pos + Vector3(0.f, 1.0f, 0.f);
-	}
-	else {
-		character_center = target_pos + Vector3(0.0f, 0.2f, 0.0f);
-	}
-
-	Vector3 colPoint;
-	Vector3 colNormal;
-
-	for (auto e : root.children) {
-		EntityMesh* em = dynamic_cast<EntityMesh*>(e);
-		if (!em) {
-			continue;
-		}
-		Mesh* mesh = em->mesh;
-		if (mesh->testSphereCollision(e->model, character_center, radius, colPoint, colNormal)) {
-			Vector3 newDir = player->velocity.dot(colNormal);
-			Vector3 Pepito = newDir * colNormal;
-
-			player->velocity.x -= Pepito.x;
-			player->velocity.z -= Pepito.z;
-
-			// Use also newDir.y to move between different 
-			// heights
-
-			player->velocity.y -= Pepito.y;
-			collisions.push_back({ colPoint,colNormal.normalize() });
-		}
-	}
-	return !collisions.empty();
 }
 
 bool World::parseScene(const char* filename)

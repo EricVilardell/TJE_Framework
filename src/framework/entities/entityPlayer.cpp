@@ -39,7 +39,7 @@ void EntityPlayer::render(Camera* camera)
 
 
 	shader->disable();
-	
+
 }
 
 void EntityPlayer::update(float delta_time)
@@ -54,7 +54,7 @@ void EntityPlayer::update(float delta_time)
 	Vector3 position = model.getTranslation();
 	Vector3 move_dir;
 	//bool is_grounded = false;
-
+	/*
 	if (Input::isKeyPressed(SDL_SCANCODE_W)) {
 		move_dir += front;
 	}
@@ -62,63 +62,188 @@ void EntityPlayer::update(float delta_time)
 	if (Input::isKeyPressed(SDL_SCANCODE_S)) {
 		move_dir -= front;
 	}
-
-	if (Input::isKeyPressed(SDL_SCANCODE_A)) {
+	*/
+	/*if (Input::isKeyPressed(SDL_SCANCODE_A)) {
 		move_dir += right;
 	}
 
 	if (Input::isKeyPressed(SDL_SCANCODE_D)) {
 		move_dir -= right;
+	}*/
+	if (is_grounded) {
+		if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
+			velocity.y = 10.0;
+		}
+		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
+			move_dir += front;
+
+		}
+
+		if (Input::isKeyPressed(SDL_SCANCODE_S)) {
+			move_dir -= front;
+		}
+
+
+
+	}
+	else {
+
+		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
+
+			model.rotate(World::get_instance()->pepito, model.frontVector());
+			points += 0.1;
+		}
+		if (Input::isKeyPressed(SDL_SCANCODE_S)) {
+			model.rotate(World::get_instance()->pepito, model.frontVector());
+			points += 0.1;
+
+		}
+		if (Input::isKeyPressed(SDL_SCANCODE_A)) {
+			points += 0.1;
+		}
+		if (Input::isKeyPressed(SDL_SCANCODE_D)) {
+			points += 0.1;
+		}
+		velocity.y -= 9.8f * delta_time;
+
 	}
 
 
-	
-		float speed_mult = 1.5f;
 
-		//move_dir.normalize();
-		move_dir *= speed_mult;
+	float speed_mult = 1.5f;
 
-		if (is_grounded) {
-			if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-				velocity.y = 10.0;
-				is_grounded = false;
-			}
+	//move_dir.normalize();
+	move_dir *= speed_mult;
+
+	// METER EESTO EN UNA FUNCION DE PLAYER
+	float max_ray_dist = 1.3f;
+	Vector3 colPoint, colNormal;
+	Vector3 center = model.getTranslation() + Vector3(0.f, 1.0f, 0.f);
+	for (auto e : World::get_instance()->root.children) {
+		EntityMesh* em = dynamic_cast<EntityMesh*>(e);
+		if (!em) {
+			continue;
+		}
+		Mesh* mesh = em->mesh;
+		if (mesh->testRayCollision(em->model, center, Vector3(0, -1, 0), colPoint, colNormal, max_ray_dist, false)) {
+			is_grounded = true;
+			World::get_instance()->pepito = 0.f;
+			break;
 		}
 		else {
-			velocity.y -= 9.8 * delta_time;
+			is_grounded = false;
 		}
-
-		// METER EESTO EN UNA FUNCION DE PLAYER
-		float max_ray_dist = 1.3f;
-		Vector3 colPoint, colNormal;
-		Vector3 center = model.getTranslation() + Vector3(0.f, 1.0f, 0.f);
-		for (auto e : World::get_instance()->root.children) {
-			EntityMesh* em = dynamic_cast<EntityMesh*>(e);
-			if (!em) {
-				continue;
-			}
-			Mesh* mesh = em->mesh;
-			if (mesh->testRayCollision(em->model, center, Vector3(0, -1, 0), colPoint, colNormal, max_ray_dist, false)) {
-				is_grounded = true;
-
-				break;
-			}
-			else {
-				is_grounded = false;
-			}
-		}
-		
-
-		velocity += move_dir;
-
-
-		position += velocity * delta_time;
-
-		velocity.x *= 0.90f;
-		velocity.z *= 0.90f;
-
-		model.setTranslation(position);
-		model.rotate(camera_yaw, Vector3(0, 1, 0));
-
-		EntityMesh::update(delta_time);
 	}
+
+	std::vector<sCollisionData> collisions;
+	CheckPlayerCollision(model.getTranslation(), collisions, 0.2f);
+	CheckPlayerCollision(model.getTranslation(), collisions, 0.6f);
+
+	velocity += move_dir;
+
+	for (const auto& collision : collisions) {
+		Vector3 colPoint = collision.colPoint;
+		Vector3 colNormal = collision.colNormal;
+
+		// Normalize the collision normal to ensure it's a unit vector
+		colNormal.normalize();
+
+		// Compute the component of the velocity along the normal
+		float velocityDotNormal = velocity.dot(colNormal);
+
+		// Compute the projection of the velocity onto the normal
+		Vector3 velocityAlongNormal = velocityDotNormal * colNormal;
+
+		// Check if the collision is with the ground (assuming ground normal is approximately (0, 1, 0))
+		bool isGroundCollision = std::abs(colNormal.y - 1.0f) < 0.01f;
+
+		if (isGroundCollision) {
+			// Apply damping to the y component of the velocity to prevent jumping
+			float dampingFactor = 0.9f; // Adjust as needed
+			velocity.y *= dampingFactor;
+
+			// Nullify the component of the velocity along the normal to prevent bouncing
+			velocity -= velocityAlongNormal;
+
+		}
+		else {
+			// Reflect the velocity around the collision normal for non-ground collisions
+			// First nullify the component of the velocity along the normal to handle energy dissipation
+			velocity -= velocityAlongNormal;
+
+			// Apply damping or restitution factor to simulate energy loss (optional)
+			float restitution = 0.8f; // Example restitution coefficient
+			Vector3 reflectedVelocity = -velocityDotNormal * colNormal * restitution;
+
+			// Add the reflected velocity to the original velocity, considering damping
+			velocity += reflectedVelocity;
+
+			// Ensure velocity doesn't reverse in the direction of normal, just zero it out if necessary
+			if (velocity.dot(colNormal) < 0) {
+				velocity -= velocity.dot(colNormal) * colNormal;
+			}
+		}
+	}
+	calculatepoints(collisions);
+	position += velocity * delta_time;
+
+	velocity.x *= 0.90f;
+	velocity.z *= 0.90f;
+
+
+	model.setTranslation(position);
+
+	model.rotate(camera_yaw, Vector3(0, 1, 0));
+	model.rotate(World::get_instance()->pepito, Vector3(-1, 0, 0));
+
+	EntityMesh::update(delta_time);
+}
+
+bool EntityPlayer::CheckPlayerCollision(const Vector3& target_pos, std::vector<sCollisionData>& collisions, float radius)
+{
+	//esto es horrible
+	Vector3 character_center;
+	if (radius == 0.6f) {
+		character_center = target_pos + Vector3(0.f, 1.0f, 0.f);
+	}
+	else {
+		character_center = target_pos + Vector3(0.0f, 0.2f, 0.0f);
+	}
+
+	Vector3 colPoint;
+	Vector3 colNormal;
+
+	for (auto e : World::get_instance()->root.children) {
+		EntityMesh* em = dynamic_cast<EntityMesh*>(e);
+		if (!em) {
+			continue;
+		}
+		Mesh* mesh = em->mesh;
+		if (mesh->testSphereCollision(e->model, character_center, radius, colPoint, colNormal)) {
+			collisions.push_back({ colPoint,colNormal.normalize() });
+		}
+	}
+	return !collisions.empty();
+}
+
+void EntityPlayer::calculatepoints(std::vector<sCollisionData>& collisions)
+{
+
+	Vector3 colPoint;
+	Vector3 colNormal;
+
+	for (auto e : World::get_instance()->root.children) {
+		EntityMesh* em = dynamic_cast<EntityMesh*>(e);
+		if (!em) {
+			continue;
+		}
+		Mesh* mesh = em->mesh;
+		if (mesh->testSphereCollision(e->model, model.getTranslation() + Vector3(0.f, 1.2f, 0.f), 1.f, colPoint, colNormal)) {
+			if (velocity.x > 0.f) {
+				points += 0.1;
+			}
+			std::cout << points << std::endl;
+			collisions.push_back({ colPoint,colNormal.normalize() });
+		}
+	}
+}

@@ -23,6 +23,8 @@ void EntityMesh::render(Camera* camera) {
 	material.shader->setUniform("u_camera_position", camera->eye);
 	material.shader->setTexture("u_texture", material.diffuse, 0);
 
+
+
 	// Render the mesh using the shader
 	mesh->render(GL_TRIANGLES);
 
