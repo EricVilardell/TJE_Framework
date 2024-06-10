@@ -53,50 +53,29 @@ void EntityPlayer::update(float delta_time)
 
 	Vector3 position = model.getTranslation();
 	Vector3 move_dir;
-	//bool is_grounded = false;
-	/*
-	if (Input::isKeyPressed(SDL_SCANCODE_W)) {
-		move_dir += front;
-	}
 
-	if (Input::isKeyPressed(SDL_SCANCODE_S)) {
-		move_dir -= front;
-	}
-	*/
-	/*if (Input::isKeyPressed(SDL_SCANCODE_A)) {
-		move_dir += right;
-	}
-
-	if (Input::isKeyPressed(SDL_SCANCODE_D)) {
-		move_dir -= right;
-	}*/
 	if (is_grounded) {
 		if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
 			velocity.y = 10.0;
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
 			move_dir += front;
-
 		}
-
 		if (Input::isKeyPressed(SDL_SCANCODE_S)) {
 			move_dir -= front;
 		}
 
-
-
 	}
 	else {
 
-		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
-
-			model.rotate(World::get_instance()->pepito, model.frontVector());
+		if (Input::isKeyPressed(SDL_SCANCODE_Q)) {
 			points += 0.1;
 		}
-		if (Input::isKeyPressed(SDL_SCANCODE_S)) {
-			model.rotate(World::get_instance()->pepito, model.frontVector());
+		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
+			move_dir += front;
+		}
+		if (Input::isKeyPressed(SDL_SCANCODE_E)) {
 			points += 0.1;
-
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_A)) {
 			points += 0.1;
@@ -104,11 +83,8 @@ void EntityPlayer::update(float delta_time)
 		if (Input::isKeyPressed(SDL_SCANCODE_D)) {
 			points += 0.1;
 		}
-		velocity.y -= 9.8f * delta_time;
-
+		velocity.y -= 9.8f * delta_time * 3;
 	}
-
-
 
 	float speed_mult = 1.5f;
 

@@ -43,11 +43,11 @@ void PlayStage::update(double seconds_elapsed)
 void PlayStage::onEnter()
 {
     //Init();
-    HCHANNEL channel = Audio::Play("data/audio/MarioAudio.wav", 0.5f, BASS_SAMPLE_LOOP);
+    /*HCHANNEL channel = Audio::Play("data/audio/MarioAudio.wav", 0.5f, BASS_SAMPLE_LOOP);
     if (channel == 0)
     {
         std::cerr << "Failed to play audio: data/audio/MarioAudio.wav" << std::endl;
-    }
+    }*/
 }
 
 void PlayStage::onExit()

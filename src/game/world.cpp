@@ -12,11 +12,21 @@ World::World()
 	//Material player_material;
 	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
 	player = new EntityPlayer();
-	player->model.setTranslation(0.f, 40.f, 0.f);
+	player->model.setTranslation(360.f, 330.f, 0.f);
 	player->material.diffuse = new Texture();
-	player->mesh = Mesh::Get("data/charmander/004 - Charmander.obj");
+	//player->mesh = Mesh::Get("data/charmander/004 - Charmander.obj");
+
+	Material player_material;
+	player_material.diffuse = Texture::Get("data/meshes/muneco.png");
+	player_material.shader = Shader::Get("data/shaders/skinning.vs", "data/shader/texture.fs");
+	player->mesh = Mesh::Get("data/meshes/export.MESH");
+	player->material = player_material;
+
+	player->isAnimated = true;
+	//player = new EntityPlayer(Mesh::Get("data/meshes/export.MESH"));
+	//player->mesh = Mesh::Get("data/meshes/sphere.obj");
 	//player->material.diffuse = Texture::Get("data/charmander/004 - Charmander.mtl");
-	player->material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+	//player->material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 
 	//subir el player como mesh ahora, no como obj, y subir un shader que no se sube solo ahora.
 	//nuevo boolean isAnimated en entity_mesh
@@ -85,12 +95,12 @@ void World::update(float seconds_elapsed)
 			camera_yaw = camera_yaw + 2.f * seconds_elapsed;
 
 		}
-		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
+		if (Input::isKeyPressed(SDL_SCANCODE_Q)) {
 			pepito = pepito - 4.f * seconds_elapsed;
 
 		}
 
-		if (Input::isKeyPressed(SDL_SCANCODE_S)) {
+		if (Input::isKeyPressed(SDL_SCANCODE_E)) {
 			pepito = pepito + 4.f * seconds_elapsed;
 
 		}
@@ -99,8 +109,12 @@ void World::update(float seconds_elapsed)
 		camera_pitch = camera_pitch - Input::mouse_delta.y * seconds_elapsed;
 		camera_pitch = clamp(camera_pitch, -M_PI * 0.4f, M_PI * 0.4f);
 
-
-
+		// Print the current position of the camera
+		Vector3 current_position = current_camera->eye; // Assuming 'eye' gives the current camera position
+		std::cout << "Current Camera Position: ("
+			<< current_position.x << ", "
+			<< current_position.y << ", "
+			<< current_position.z << ")" << std::endl;
 
 		Matrix44 mYaw;
 		mYaw.setRotation(camera_yaw, Vector3(0, 1, 0));
