@@ -38,6 +38,8 @@ void PlayStage::render()
 void PlayStage::update(double seconds_elapsed)
 {
 	World::get_instance()->update(seconds_elapsed);
+    World::get_instance()->end_game = false;
+
 }
 
 void PlayStage::onEnter()
@@ -53,6 +55,7 @@ void PlayStage::onEnter()
 void PlayStage::onExit()
 {
 }
+
 
 void Stage::render()
 {

@@ -13,24 +13,29 @@ World::World()
 	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
 	player = new EntityPlayer();
 	player->model.setTranslation(383.f, 330.f, 0.f);
+	//player->model.setTranslation(383.f, 330.f, -265.f);	//second spawn wrong map collisions
 	player->material.diffuse = new Texture();
-	//player->mesh = Mesh::Get("data/charmander/004 - Charmander.obj");
+	player->mesh = Mesh::Get("data/charmander/004 - Charmander.obj");
 
-	Material player_material;
+	/*Material player_material;
 	player_material.diffuse = Texture::Get("data/meshes/muneco.png");
 	player_material.shader = Shader::Get("data/shaders/skinning.vs", "data/shader/texture.fs");
 	player->mesh = Mesh::Get("data/meshes/export.MESH");
 	player->material = player_material;
 
-	player->isAnimated = true;
-	//player = new EntityPlayer(Mesh::Get("data/meshes/export.MESH"));
-	//player->mesh = Mesh::Get("data/meshes/sphere.obj");
-	//player->material.diffuse = Texture::Get("data/charmander/004 - Charmander.mtl");
-	//player->material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+	player->isAnimated = true;*/
+	//player = new entityplayer(mesh::get("data/meshes/export.mesh"));
+	//player->mesh = mesh::get("data/meshes/sphere.obj");
+	player->material.diffuse = Texture::Get("data/charmander/004 - charmander.mtl");
+	player->material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 
 	//subir el player como mesh ahora, no como obj, y subir un shader que no se sube solo ahora.
 	//nuevo boolean isAnimated en entity_mesh
 	//classe animator meterla en update en un if del isAnimated, con deltaTime, en el entity_mesh
+
+	zone_min = Vector3(-8.0f, 0.f, -22.0f); // Set your minimum corner here
+	zone_max = Vector3(4.0f, 0.f, 25.0f);    // Set your maximum corner here
+	end_game = false;
 
 
 	Material landscape_cubemap;
@@ -153,6 +158,19 @@ void World::update(float seconds_elapsed)
 		current_camera->lookAt(eye, center, Vector3(0, 1, 0));
 		skybox->model = player->model;
 
+	}
+	Vector3 player_position = player->model.getTranslation();
+	if (!end_game && player_position.x >= zone_min.x && player_position.x <= zone_max.x && player_position.z >= zone_min.z && player_position.z <= zone_max.z) { // Only checking x and z coordinates
+		std::cout << "Player entered the target zone! Game over." << std::endl;
+		end_game = true;
+		// Change game state to end game
+		Game::instance->currentStage = Game::instance->intro_stage;
+		player->model.setTranslation(383.f, 335.f, 0.f);
+	}
+
+	if (player->model.getTranslation().y < -10.0f) {
+		Game::instance->currentStage = Game::instance->intro_stage;
+		player->model.setTranslation(383.f, 335.f, 0.f);
 	}
 
 	root.update(seconds_elapsed);

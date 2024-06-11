@@ -24,6 +24,8 @@ public:
 	float elapsed_time;
 	int fps;
 	bool must_exit;
+	IntroStage* intro_stage = new IntroStage();
+	PlayStage* play_stage = new PlayStage();
 	Stage* currentStage = nullptr;
 
 	//some vars

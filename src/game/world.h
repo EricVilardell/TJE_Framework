@@ -28,6 +28,9 @@ public:
 	float camera_speed = 2.0f;
 	float mouse_speed = 100.f;
 	bool free_camera = false;
+	Vector3 zone_min;
+	Vector3 zone_max;
+	bool end_game;
 	World(); 			// Constructor
 
 	void render();
