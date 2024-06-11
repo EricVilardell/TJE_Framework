@@ -12,7 +12,7 @@ World::World()
 	//Material player_material;
 	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
 	player = new EntityPlayer();
-	player->model.setTranslation(360.f, 330.f, 0.f);
+	player->model.setTranslation(383.f, 330.f, 0.f);
 	player->material.diffuse = new Texture();
 	//player->mesh = Mesh::Get("data/charmander/004 - Charmander.obj");
 
@@ -65,7 +65,7 @@ void World::render()
 void World::update(float seconds_elapsed)
 {
 	if (free_camera) {
-		float speed = seconds_elapsed * mouse_speed; //the speed is defined by the seconds_elapsed so it goes constant
+		float speed = seconds_elapsed * mouse_speed; 
 
 		// Example
 
@@ -105,16 +105,10 @@ void World::update(float seconds_elapsed)
 
 		}
 
-		//camera_yaw = camera_yaw - player->velocity.z * seconds_elapsed;
 		camera_pitch = camera_pitch - Input::mouse_delta.y * seconds_elapsed;
 		camera_pitch = clamp(camera_pitch, -M_PI * 0.4f, M_PI * 0.4f);
 
-		// Print the current position of the camera
-		Vector3 current_position = current_camera->eye; // Assuming 'eye' gives the current camera position
-		std::cout << "Current Camera Position: ("
-			<< current_position.x << ", "
-			<< current_position.y << ", "
-			<< current_position.z << ")" << std::endl;
+		Vector3 current_position = current_camera->eye; 
 
 		Matrix44 mYaw;
 		mYaw.setRotation(camera_yaw, Vector3(0, 1, 0));
@@ -132,6 +126,29 @@ void World::update(float seconds_elapsed)
 		center = player->model.getTranslation() + Vector3(0.f, 0.1f, 0.0f);
 
 		Vector3 dir = eye - center;
+
+		Vector3 collision;
+		Vector3 normal;
+		float max_ray_dist = dir.length();
+
+		// Check for collision
+		bool collided = false;
+		for (auto e : World::get_instance()->root.children) {
+			EntityMesh* em = dynamic_cast<EntityMesh*>(e);
+			if (!em) {
+				continue;
+			}
+			Mesh* mesh = em->mesh;
+			if (mesh->testRayCollision(em->model, center, dir.normalize(), collision, normal, max_ray_dist, false)) {
+				collided = true;
+				break;
+			}
+		}
+
+		if (collided) {
+			eye = collision + normal * 0.1f;
+		}
+
 		player->update(seconds_elapsed);
 		current_camera->lookAt(eye, center, Vector3(0, 1, 0));
 		skybox->model = player->model;

@@ -10,7 +10,7 @@ IntroStage::IntroStage()
 
 void IntroStage::render()
 {
-	drawText(32, 32, "pulse R apra jugar", Vector3(50, 50, 50), 2);
+	drawText(32, 32, "pulse R apra jugar", Vector3(100, 100, 50), 2);
 }
 
 void IntroStage::update(double seconds_elapsed)
