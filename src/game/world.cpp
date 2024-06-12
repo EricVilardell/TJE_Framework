@@ -8,7 +8,6 @@ World::World()
 {
 	int window_width = Game::instance->window_width;
 	int window_height = Game::instance->window_height;
-
 	//Material player_material;
 	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
 	player = new EntityPlayer();
@@ -154,22 +153,28 @@ void World::update(float seconds_elapsed)
 			eye = collision + normal * 0.1f;
 		}
 
+		std::cout << "Player points: " << pepito << std::endl;
 		player->update(seconds_elapsed);
 		current_camera->lookAt(eye, center, Vector3(0, 1, 0));
 		skybox->model = player->model;
 
 	}
-	Vector3 player_position = player->model.getTranslation();
-	if (!end_game && player_position.x >= zone_min.x && player_position.x <= zone_max.x && player_position.z >= zone_min.z && player_position.z <= zone_max.z) { // Only checking x and z coordinates
+
+	if (!end_game &&
+		player->model.getTranslation().x >= zone_min.x && player->model.getTranslation().x <= zone_max.x &&
+		player->model.getTranslation().z >= zone_min.z && player->model.getTranslation().z <= zone_max.z) { // Only checking x and z coordinates
 		std::cout << "Player entered the target zone! Game over." << std::endl;
 		end_game = true;
-		// Change game state to end game
-		Game::instance->currentStage = Game::instance->intro_stage;
+		Game::instance->currentStage->onExit();
+		Game::instance->currentStage = Game::instance->win_stage;
+		Game::instance->currentStage->onEnter();
 		player->model.setTranslation(383.f, 335.f, 0.f);
 	}
 
 	if (player->model.getTranslation().y < -10.0f) {
-		Game::instance->currentStage = Game::instance->intro_stage;
+		Game::instance->currentStage->onExit();
+		Game::instance->currentStage = Game::instance->end_stage;
+		Game::instance->currentStage->onEnter();
 		player->model.setTranslation(383.f, 335.f, 0.f);
 	}
 

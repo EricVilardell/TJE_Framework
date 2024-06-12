@@ -1,7 +1,7 @@
 #include "Stage.h"
 #include <iostream>
 #include "world.h"
-#include "framework/audio.h"
+
 
 IntroStage::IntroStage()
 {
@@ -45,16 +45,81 @@ void PlayStage::update(double seconds_elapsed)
 void PlayStage::onEnter()
 {
     //Init();
-    /*HCHANNEL channel = Audio::Play("data/audio/MarioAudio.wav", 0.5f, BASS_SAMPLE_LOOP);
+    channel = Audio::Play("data/audio/cancion_principal.wav", 0.2f, BASS_SAMPLE_LOOP);
     if (channel == 0)
     {
-        std::cerr << "Failed to play audio: data/audio/MarioAudio.wav" << std::endl;
-    }*/
+        std::cerr << "Failed to play audio: data/audio/cancion_principal.wav" << std::endl;
+    }
 }
 
 void PlayStage::onExit()
 {
+    if (channel != 0)
+    {
+        Audio::Stop(channel);
+    }
 }
+
+EndStage::EndStage()
+{
+}
+
+void EndStage::render()
+{
+    //World::get_instance()->render();
+    drawText(32, 32, "tas muerto", Vector3(200, 200, 50), 2);
+}
+
+void EndStage::update(double seconds_elapsed)
+{
+    World::get_instance()->update(seconds_elapsed);
+    //World::get_instance()->end_game = false;
+
+}
+
+void EndStage::onEnter()
+{
+    //Init();
+    float volume_death = 0.5f;
+    muerte = Audio::Play("data/audio/muerte.wav", volume_death, false);
+    if (muerte == 0)
+    {
+        std::cerr << "Failed to play audio: data/audio/muerte.wav" << std::endl;
+    }
+    volume_death = 0.0f;
+}
+
+void EndStage::onExit()
+{
+}
+
+WinStage::WinStage()
+{
+}
+
+void WinStage::render()
+{
+    drawText(32, 32, "Congrats You Finished Mountain Rush with x points.", Vector3(100, 100, 50), 2);
+}
+
+void WinStage::update(double seconds_elapsed)
+{
+
+}
+
+void WinStage::onEnter()
+{
+    HCHANNEL win = Audio::Play("data/audio/Win.wav", 0.5, false);
+    if (win == 0)
+    {
+        std::cerr << "Failed to play audio: data/audio/Win.wav" << std::endl;
+    }
+}
+
+void WinStage::onExit()
+{
+}
+
 
 
 void Stage::render()

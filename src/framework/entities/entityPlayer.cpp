@@ -90,11 +90,15 @@ void EntityPlayer::update(float delta_time)
 
 	//move_dir.normalize();
 	move_dir *= speed_mult;
+	float pepitoo = World::get_instance()->pepito;
+	pepitoo = (int)pepitoo % 5;
 
 	// METER EESTO EN UNA FUNCION DE PLAYER
 	float max_ray_dist = 1.3f;
 	Vector3 colPoint, colNormal;
 	Vector3 center = model.getTranslation() + Vector3(0.f, 1.0f, 0.f);
+	bool previously_grounded = is_grounded;
+
 	for (auto e : World::get_instance()->root.children) {
 		EntityMesh* em = dynamic_cast<EntityMesh*>(e);
 		if (!em) {
@@ -103,12 +107,36 @@ void EntityPlayer::update(float delta_time)
 		Mesh* mesh = em->mesh;
 		if (mesh->testRayCollision(em->model, center, Vector3(0, -1, 0), colPoint, colNormal, max_ray_dist, false)) {
 			is_grounded = true;
+			if (model.getTranslation().y > 10.0f) {
+				if (previously_grounded == false && airborne_time > 1.7f) {		/////revisar esto
+					HCHANNEL hellYea = Audio::Play("data/audio/hellYea.wav", 0.5f, false);
+					if (hellYea == 0) {
+						std::cerr << "Failed to play audio: data/audio/hellYea.wav" << std::endl;
+					}
+					airborne_time = 0.f;
+				}
+			}
+
+			if (pepitoo < -1 || pepitoo > 1) {
+				points -= 100;
+				HCHANNEL Pipe = Audio::Play("data/audio/Pipe.wav", 0.5f, false);
+				if (Pipe == 0) {
+					std::cerr << "Failed to play audio: data/audio/Pipe.wav" << std::endl;
+				}
+			}
 			World::get_instance()->pepito = 0.f;
 			break;
 		}
 		else {
 			is_grounded = false;
 		}
+	}
+
+	if (!is_grounded) {
+		airborne_time += delta_time; 
+	}
+	else {
+		airborne_time = 0.f; 
 	}
 
 	std::vector<sCollisionData> collisions;
@@ -165,7 +193,6 @@ void EntityPlayer::update(float delta_time)
 
 	velocity.x *= 0.90f;
 	velocity.z *= 0.90f;
-
 
 	model.setTranslation(position);
 

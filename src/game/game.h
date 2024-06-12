@@ -26,6 +26,9 @@ public:
 	bool must_exit;
 	IntroStage* intro_stage = new IntroStage();
 	PlayStage* play_stage = new PlayStage();
+	EndStage* end_stage = new EndStage();
+	WinStage* win_stage = new WinStage();
+
 	Stage* currentStage = nullptr;
 
 	//some vars
