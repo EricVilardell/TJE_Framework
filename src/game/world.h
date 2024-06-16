@@ -20,7 +20,9 @@ public:
 	}
 	EntityMesh* skybox;
 	EntityPlayer* player;
+	EntityMesh* snowboard;
 	Entity root;
+	Camera* camera2d;
 	Camera* current_camera = Game::instance->camera;
 	float camera_yaw = 0.f;
 	float camera_pitch = 0.f;

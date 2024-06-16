@@ -61,27 +61,27 @@ void EntityPlayer::update(float delta_time)
 		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
 			move_dir += front;
 		}
-		if (Input::isKeyPressed(SDL_SCANCODE_S)) {
+		/*if (Input::isKeyPressed(SDL_SCANCODE_S)) {
 			move_dir -= front;
-		}
+		}*/
 
 	}
 	else {
 
 		if (Input::isKeyPressed(SDL_SCANCODE_Q)) {
-			points += 0.1;
+			points += 0.15;
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
 			move_dir += front;
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_E)) {
-			points += 0.1;
+			points += 0.15;
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_A)) {
-			points += 0.1;
+			points += 0.05;
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_D)) {
-			points += 0.1;
+			points += 0.05;
 		}
 		velocity.y -= 9.8f * delta_time * 3;
 	}

@@ -8,34 +8,28 @@ World::World()
 {
 	int window_width = Game::instance->window_width;
 	int window_height = Game::instance->window_height;
-	//Material player_material;
-	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/color.fs");
+	
 	player = new EntityPlayer();
 	player->model.setTranslation(383.f, 330.f, 0.f);
-	//player->model.setTranslation(383.f, 330.f, -265.f);	//second spawn wrong map collisions
+
+	camera2d = new Camera();
+	camera2d->view_matrix.setIdentity();
+	camera2d->setOrthographic(0, window_width, window_height, 0, -1.f, 1.f);
+
 	player->material.diffuse = new Texture();
 	player->mesh = Mesh::Get("data/charmander/004 - Charmander.obj");
 
-	/*Material player_material;
-	player_material.diffuse = Texture::Get("data/meshes/muneco.png");
-	player_material.shader = Shader::Get("data/shaders/skinning.vs", "data/shader/texture.fs");
-	player->mesh = Mesh::Get("data/meshes/export.MESH");
-	player->material = player_material;
-
-	player->isAnimated = true;*/
-	//player = new entityplayer(mesh::get("data/meshes/export.mesh"));
-	//player->mesh = mesh::get("data/meshes/sphere.obj");
 	player->material.diffuse = Texture::Get("data/charmander/004 - charmander.mtl");
 	player->material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 
-	//subir el player como mesh ahora, no como obj, y subir un shader que no se sube solo ahora.
-	//nuevo boolean isAnimated en entity_mesh
-	//classe animator meterla en update en un if del isAnimated, con deltaTime, en el entity_mesh
+	snowboard = new EntityMesh();
+	snowboard->material.diffuse = new Texture();
+	snowboard->mesh = Mesh::Get("data/snowboard.obj");
+	player->addChild(snowboard);
 
-	zone_min = Vector3(-8.0f, 0.f, -22.0f); // Set your minimum corner here
-	zone_max = Vector3(4.0f, 0.f, 25.0f);    // Set your maximum corner here
+	zone_min = Vector3(-8.0f, 0.f, -22.0f); 
+	zone_max = Vector3(4.0f, 0.f, 25.0f);
 	end_game = false;
-
 
 	Material landscape_cubemap;
 	landscape_cubemap.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
@@ -59,7 +53,7 @@ void World::render()
 	glEnable(GL_DEPTH_TEST);
 
 	player->render(current_camera);
-	drawGrid();
+	//drawGrid();
 
 	root.render(current_camera);
 
@@ -83,12 +77,20 @@ void World::update(float seconds_elapsed)
 		// Async input to move the camera around
 		if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) speed *= 10; //move faster with left shift
 		if (Input::isKeyPressed(SDL_SCANCODE_W)) current_camera->move(Vector3(0.0f, 0.0f, 1.0f) * speed);
-		if (Input::isKeyPressed(SDL_SCANCODE_S)) current_camera->move(Vector3(0.0f, 0.0f, -1.0f) * speed);
+		//if (Input::isKeyPressed(SDL_SCANCODE_S)) current_camera->move(Vector3(0.0f, 0.0f, -1.0f) * speed);
 		if (Input::isKeyPressed(SDL_SCANCODE_A)) current_camera->move(Vector3(1.0f, 0.0f, 0.0f) * speed);
 		if (Input::isKeyPressed(SDL_SCANCODE_D)) current_camera->move(Vector3(-1.0f, 0.0f, 0.0f) * speed);
 	}
 	else {
 
+		if (Input::isKeyPressed(SDL_SCANCODE_Y)) {
+			player->model.setTranslation(383.f, 330.f, -265.f);	//second spawn wrong map collisions
+
+		}
+		if (Input::isKeyPressed(SDL_SCANCODE_T)) {
+			player->model.setTranslation(383.f, 330.f, 0.f);	//second spawn good map collisions
+
+		}
 
 		if (Input::isKeyPressed(SDL_SCANCODE_A)) {
 			camera_yaw = camera_yaw - 2.f * seconds_elapsed;
@@ -111,6 +113,16 @@ void World::update(float seconds_elapsed)
 
 		camera_pitch = camera_pitch - Input::mouse_delta.y * seconds_elapsed;
 		camera_pitch = clamp(camera_pitch, -M_PI * 0.4f, M_PI * 0.4f);
+
+		player->model.rotate(90 * DEG2RAD, Vector3(0, 1, 0));
+
+		snowboard->model.setTranslation(player->model.getTranslation());
+		snowboard->model.rotate(camera_yaw, Vector3(0, 1, 0));
+		snowboard->model.rotate(pepito, Vector3(-1, 0, 0));
+
+		if (player->model.getTranslation().x < 377) {
+			snowboard->model.rotate(-35 * DEG2RAD, Vector3(1, 0, 0));
+		}
 
 		Vector3 current_position = current_camera->eye; 
 
@@ -210,7 +222,7 @@ sCollisionData World::raycast(const Vector3& origin, const Vector3& direction, i
 	for (auto e : root.children)
 	{
 		EntityCollider* ec = dynamic_cast<EntityCollider*>(e);
-		if (ec == nullptr/* || !(ec->getLayer() & layer)*/) {
+		if (ec == nullptr) {
 			continue;
 		}
 

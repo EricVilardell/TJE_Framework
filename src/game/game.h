@@ -24,15 +24,16 @@ public:
 	float elapsed_time;
 	int fps;
 	bool must_exit;
-	IntroStage* intro_stage = new IntroStage();
+	IntroStage* intro_stage;
 	PlayStage* play_stage = new PlayStage();
-	EndStage* end_stage = new EndStage();
-	WinStage* win_stage = new WinStage();
+	EndStage* end_stage;
+	WinStage* win_stage;
 
 	Stage* currentStage = nullptr;
 
 	//some vars
 	Camera* camera; //our global camera
+	Camera* camera2d;
 	bool mouse_locked; //tells if the mouse is locked (not seen)
 
 

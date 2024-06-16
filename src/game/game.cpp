@@ -36,6 +36,10 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	camera->lookAt(Vector3(0.f, 100.f, 100.f), Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.f, 0.f)); //position the camera and point to 0,0,0
 	camera->setPerspective(70.f, window_width / (float)window_height, 0.1f, 10000.f); //set the projection, we want to be perspective
 
+	camera2d = new Camera();
+	camera2d->view_matrix.setIdentity();
+	camera2d->setOrthographic(0, window_width, 0, window_height, -1.f, 1.f);
+
 	// Load one texture using the Texture Manager
 	texture = Texture::Get("data/textures/texture.tga");
 
@@ -45,7 +49,9 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	// Example of shader loading using the shaders manager
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 
-
+	intro_stage = new IntroStage();
+	end_stage = new EndStage();
+	win_stage = new WinStage();
 	currentStage = intro_stage;
 
 	// Hide the cursor
@@ -55,7 +61,6 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 //what to do when the image has to be draw
 void Game::render(void)
 {
-
 	// Set the clear color (the background color)
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -74,7 +79,9 @@ void Game::render(void)
 
 	// Render the FPS, Draw Calls, etc
 	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
-	drawText(20, 20, std::to_string(World::get_instance()->player->points), Vector3(2, 2, 2), 4);
+	if (currentStage == play_stage) {
+		drawText(20, 20, std::to_string(World::get_instance()->player->points), Vector3(2, 2, 2), 4);
+	}
 	// Swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);
 }
