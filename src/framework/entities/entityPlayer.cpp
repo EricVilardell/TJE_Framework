@@ -56,15 +56,11 @@ void EntityPlayer::update(float delta_time)
 
 	if (is_grounded) {
 		if (Input::wasKeyPressed(SDL_SCANCODE_SPACE)) {
-			velocity.y = 10.0;
+			velocity.y = 15.0;
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
 			move_dir += front;
 		}
-		/*if (Input::isKeyPressed(SDL_SCANCODE_S)) {
-			move_dir -= front;
-		}*/
-
 	}
 	else {
 
@@ -92,6 +88,8 @@ void EntityPlayer::update(float delta_time)
 	move_dir *= speed_mult;
 	float pepitoo = World::get_instance()->pepito;
 	pepitoo = (int)pepitoo % 5;
+	std::cout << "model.getTranslation().y: " << model.getTranslation().y << std::endl;
+
 
 	// METER EESTO EN UNA FUNCION DE PLAYER
 	float max_ray_dist = 1.3f;
@@ -107,9 +105,10 @@ void EntityPlayer::update(float delta_time)
 		Mesh* mesh = em->mesh;
 		if (mesh->testRayCollision(em->model, center, Vector3(0, -1, 0), colPoint, colNormal, max_ray_dist, false)) {
 			is_grounded = true;
-			if (model.getTranslation().y > 10.0f) {
-				if (previously_grounded == false && airborne_time > 1.7f) {		/////revisar esto
+			if (model.getTranslation().y >= 100.0f && model.getTranslation().y < 300.0f) {
+				if (previously_grounded == false && airborne_time > 2.0f) {
 					HCHANNEL hellYea = Audio::Play("data/audio/hellYea.wav", 0.5f, false);
+					std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
 					if (hellYea == 0) {
 						std::cerr << "Failed to play audio: data/audio/hellYea.wav" << std::endl;
 					}
@@ -117,7 +116,7 @@ void EntityPlayer::update(float delta_time)
 				}
 			}
 
-			if (pepitoo < -1 || pepitoo > 1) {
+			if (pepitoo == -4 || pepitoo == -3 || pepitoo == -2 || pepitoo == 2 || pepitoo == 3 || pepitoo == 4) {
 				points -= 100;
 				HCHANNEL Pipe = Audio::Play("data/audio/Pipe.wav", 0.5f, false);
 				if (Pipe == 0) {

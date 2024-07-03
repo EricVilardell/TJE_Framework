@@ -88,7 +88,7 @@ void World::update(float seconds_elapsed)
 
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_T)) {
-			player->model.setTranslation(383.f, 330.f, 0.f);	//second spawn good map collisions
+			player->model.setTranslation(383.f, 330.f, 0.f);	//spawn good map collisions
 
 		}
 
@@ -112,7 +112,7 @@ void World::update(float seconds_elapsed)
 		}
 
 		camera_pitch = camera_pitch - Input::mouse_delta.y * seconds_elapsed;
-		camera_pitch = clamp(camera_pitch, -M_PI * 0.4f, M_PI * 0.4f);
+		camera_pitch = clamp(camera_pitch, 0.8f, M_PI * 0.4f);
 
 		player->model.rotate(90 * DEG2RAD, Vector3(0, 1, 0));
 
@@ -162,10 +162,9 @@ void World::update(float seconds_elapsed)
 		}
 
 		if (collided) {
-			eye = collision + normal * 0.1f;
+			eye = collision + normal * 0.1f + Vector3(0.0f, 0.2f, 0.0f);
 		}
 
-		std::cout << "Player points: " << pepito << std::endl;
 		player->update(seconds_elapsed);
 		current_camera->lookAt(eye, center, Vector3(0, 1, 0));
 		skybox->model = player->model;

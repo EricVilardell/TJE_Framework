@@ -1,6 +1,7 @@
 #include "Stage.h"
 #include <iostream>
 #include "world.h"
+#include "framework/entities/entityPlayer.h"
 #include "framework/entities/EntityUI.h"
 
 EntityUI* background_intro;
@@ -35,7 +36,6 @@ IntroStage::IntroStage()
 
 void IntroStage::render()
 {
-    //drawText(32, 32, "pulse R apra jugar", Vector3(100, 100, 50), 2);
     background_intro->render(World::get_instance()->camera2d);
     play_button->render(World::get_instance()->camera2d);
     exit_button->render(World::get_instance()->camera2d);
@@ -100,6 +100,8 @@ void PlayStage::update(double seconds_elapsed)
 void PlayStage::onEnter()
 {
     //Init();
+    World::get_instance()->player->points = 0.0f;
+    World::get_instance()->player->model.setTranslation(383.f, 330.f, 0.f);
     channel = Audio::Play("data/audio/cancion_principal.wav", 0.2f, BASS_SAMPLE_LOOP);
     if (channel == 0)
     {
@@ -139,7 +141,6 @@ EndStage::EndStage()
 
 void EndStage::render()
 {
-    //drawText(32, 32, "tas muerto", Vector3(200, 200, 50), 2);
     background_lost->render(World::get_instance()->camera2d);
     play_button->render(World::get_instance()->camera2d);
     exit_button->render(World::get_instance()->camera2d);
