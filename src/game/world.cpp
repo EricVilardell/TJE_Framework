@@ -73,7 +73,7 @@ void World::update(float seconds_elapsed)
 			current_camera->rotate(Input::mouse_delta.x * 0.0005f, Vector3(0.0f, -1.0f, 0.0f));
 			current_camera->rotate(Input::mouse_delta.y * 0.0005f, current_camera->getLocalVector(Vector3(-1.0f, 0.0f, 0.0f)));
 		}
-
+		
 		// Async input to move the camera around
 		if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) speed *= 10; //move faster with left shift
 		if (Input::isKeyPressed(SDL_SCANCODE_W)) current_camera->move(Vector3(0.0f, 0.0f, 1.0f) * speed);
@@ -173,11 +173,23 @@ void World::update(float seconds_elapsed)
 
 	if (!end_game &&
 		player->model.getTranslation().x >= zone_min.x && player->model.getTranslation().x <= zone_max.x &&
-		player->model.getTranslation().z >= zone_min.z && player->model.getTranslation().z <= zone_max.z) { // Only checking x and z coordinates
-		std::cout << "Player entered the target zone! Game over." << std::endl;
+		player->model.getTranslation().z >= zone_min.z && player->model.getTranslation().z <= zone_max.z && 
+		player->points >= 250) { // Only checking x and z coordinates
+		std::cout << "Player entered the target zone with more than 250 points! Game over." << std::endl;
 		end_game = true;
 		Game::instance->currentStage->onExit();
 		Game::instance->currentStage = Game::instance->win_stage;
+		Game::instance->currentStage->onEnter();
+		player->model.setTranslation(383.f, 335.f, 0.f);
+	}
+	else if (!end_game &&
+		player->model.getTranslation().x >= zone_min.x && player->model.getTranslation().x <= zone_max.x &&
+		player->model.getTranslation().z >= zone_min.z && player->model.getTranslation().z <= zone_max.z &&
+		player->points < 250) {
+		std::cout << "Player entered the target zone with less than 250 points! Game over." << std::endl;
+		end_game = true;
+		Game::instance->currentStage->onExit();
+		Game::instance->currentStage = Game::instance->win_stage_less250;
 		Game::instance->currentStage->onEnter();
 		player->model.setTranslation(383.f, 335.f, 0.f);
 	}

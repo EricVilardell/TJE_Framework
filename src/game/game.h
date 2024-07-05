@@ -28,6 +28,7 @@ public:
 	PlayStage* play_stage = new PlayStage();
 	EndStage* end_stage;
 	WinStage* win_stage;
+	WinStage_less250* win_stage_less250;
 
 	Stage* currentStage = nullptr;
 

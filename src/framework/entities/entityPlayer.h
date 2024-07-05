@@ -11,6 +11,7 @@ public:
 	EntityPlayer();
 	Vector3 velocity = (0.0f, 0.0f, 0.0f);
 	float points = 0.f;
+	float points_hidden = 0.f;
 	bool isAnimated = false;
 	float airborne_time;
 	void render(Camera* camera);

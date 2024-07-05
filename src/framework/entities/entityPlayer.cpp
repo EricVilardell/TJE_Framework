@@ -65,19 +65,19 @@ void EntityPlayer::update(float delta_time)
 	else {
 
 		if (Input::isKeyPressed(SDL_SCANCODE_Q)) {
-			points += 0.15;
+			points_hidden += 0.15;
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_W)) {
 			move_dir += front;
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_E)) {
-			points += 0.15;
+			points_hidden += 0.15;
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_A)) {
-			points += 0.05;
+			points_hidden += 0.05;
 		}
 		if (Input::isKeyPressed(SDL_SCANCODE_D)) {
-			points += 0.05;
+			points_hidden += 0.05;
 		}
 		velocity.y -= 9.8f * delta_time * 3;
 	}
@@ -108,7 +108,8 @@ void EntityPlayer::update(float delta_time)
 			if (model.getTranslation().y >= 100.0f && model.getTranslation().y < 300.0f) {
 				if (previously_grounded == false && airborne_time > 2.0f) {
 					HCHANNEL hellYea = Audio::Play("data/audio/hellYea.wav", 0.5f, false);
-					std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+					points += points_hidden;
+					points_hidden = 0;
 					if (hellYea == 0) {
 						std::cerr << "Failed to play audio: data/audio/hellYea.wav" << std::endl;
 					}

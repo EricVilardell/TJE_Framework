@@ -271,6 +271,83 @@ void WinStage::onExit()
 
 
 
+WinStage_less250::WinStage_less250()
+{
+    int width = Game::instance->window_width;
+    int height = Game::instance->window_height;
+
+    Material background_mat;
+    background_mat.diffuse = Texture::Get("data/textures/background_won.png");
+    background_won = new EntityUI(Vector2(width, height), Vector2(width, height), background_mat, "background");
+    Material play_mat;
+    play_mat.diffuse = Texture::Get("data/textures/playbutton.png");
+    play_button_win = new EntityUI(Vector2(width - 250, 950), Vector2(240, 240), play_mat, "play");
+    Material exit_mat;
+    exit_mat.diffuse = Texture::Get("data/textures/exitbutton.png");
+    exit_button_win = new EntityUI(Vector2(width + 250, 950), Vector2(175, 175), exit_mat, "exit");
+
+    std::cout << (play_button->position.x - play_button->size.x) * 0.5f << std::endl;
+    std::cout << (play_button->position.x + play_button->size.x) * 0.5f << std::endl;
+
+    std::cout << (play_button->position.y - play_button->size.y) * 0.5f << std::endl;
+    std::cout << (play_button->position.y + play_button->size.y) * 0.5f << std::endl;
+}
+
+void WinStage_less250::render()
+{
+    std::string message = std::to_string(World::get_instance()->player->points);
+    background_won->render(World::get_instance()->camera2d);
+    play_button_win->render(World::get_instance()->camera2d);
+    exit_button_win->render(World::get_instance()->camera2d);
+    drawText(400, 215, message, Vector3(100, 100, 50), 7);
+}
+
+void WinStage_less250::update(double seconds_elapsed)
+{
+    Vector2 mouse_pos = Input::mouse_position;
+
+    if (mouse_pos.x > ((play_button_win->position.x - play_button_win->size.x) * 0.5f) &&
+        mouse_pos.x< ((play_button_win->position.x + play_button_win->size.x) * 0.5f) &&
+        mouse_pos.y >((play_button_win->position.y - play_button_win->size.y) * 0.5f) &&
+        mouse_pos.y < ((play_button_win->position.y + play_button_win->size.y) * 0.5f)) {
+        play_button_win->material.color = Vector4::RED;
+        if (Input::isMousePressed(SDL_BUTTON_LEFT)) {
+            Game::instance->moveToStage(Game::instance->play_stage);
+        }
+    }
+    else {
+        play_button_win->material.color = Vector4::WHITE;
+    }
+    if (mouse_pos.x > ((exit_button_win->position.x - exit_button_win->size.x) * 0.5f) &&
+        mouse_pos.x< ((exit_button_win->position.x + exit_button_win->size.x) * 0.5f) &&
+        mouse_pos.y >((exit_button_win->position.y - exit_button_win->size.y) * 0.5f) &&
+        mouse_pos.y < ((exit_button_win->position.y + exit_button_win->size.y) * 0.5f)) {
+        exit_button_win->material.color = Vector4::RED;
+        if (Input::isMousePressed(SDL_BUTTON_LEFT)) {
+            Game::instance->must_exit = true;
+        }
+    }
+    else {
+        exit_button_win->material.color = Vector4::WHITE;
+    }
+    World::get_instance()->update(seconds_elapsed);
+}
+
+void WinStage_less250::onEnter()
+{
+    HCHANNEL win = Audio::Play("data/audio/Win.wav", 0.5, false);
+    if (win == 0)
+    {
+        std::cerr << "Failed to play audio: data/audio/Win.wav" << std::endl;
+    }
+}
+
+void WinStage_less250::onExit()
+{
+}
+
+
+
 void Stage::render()
 {
 }

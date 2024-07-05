@@ -52,6 +52,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	intro_stage = new IntroStage();
 	end_stage = new EndStage();
 	win_stage = new WinStage();
+	win_stage_less250 = new WinStage_less250();
 	currentStage = intro_stage;
 
 	// Hide the cursor

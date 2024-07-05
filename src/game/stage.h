@@ -47,3 +47,12 @@ public:
 	void onEnter();
 	void onExit();
 };
+
+class WinStage_less250 : public Stage {
+public:
+	WinStage_less250();
+	void render(); // Empty body
+	void update(double seconds_elapsed); // Empty body
+	void onEnter();
+	void onExit();
+};
