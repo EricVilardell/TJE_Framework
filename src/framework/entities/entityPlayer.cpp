@@ -106,7 +106,7 @@ void EntityPlayer::update(float delta_time)
 		if (mesh->testRayCollision(em->model, center, Vector3(0, -1, 0), colPoint, colNormal, max_ray_dist, false)) {
 			is_grounded = true;
 			if (model.getTranslation().y >= 100.0f && model.getTranslation().y < 300.0f) {
-				if (previously_grounded == false && airborne_time > 2.0f) {
+				if (previously_grounded == false && airborne_time > 1.0f) {
 					HCHANNEL hellYea = Audio::Play("data/audio/hellYea.wav", 0.5f, false);
 					points += points_hidden;
 					points_hidden = 0;
@@ -149,40 +149,28 @@ void EntityPlayer::update(float delta_time)
 		Vector3 colPoint = collision.colPoint;
 		Vector3 colNormal = collision.colNormal;
 
-		// Normalize the collision normal to ensure it's a unit vector
 		colNormal.normalize();
 
-		// Compute the component of the velocity along the normal
 		float velocityDotNormal = velocity.dot(colNormal);
 
-		// Compute the projection of the velocity onto the normal
 		Vector3 velocityAlongNormal = velocityDotNormal * colNormal;
 
-		// Check if the collision is with the ground (assuming ground normal is approximately (0, 1, 0))
 		bool isGroundCollision = std::abs(colNormal.y - 1.0f) < 0.01f;
 
 		if (isGroundCollision) {
-			// Apply damping to the y component of the velocity to prevent jumping
-			float dampingFactor = 0.9f; // Adjust as needed
+			float dampingFactor = 0.9f; 
 			velocity.y *= dampingFactor;
-
-			// Nullify the component of the velocity along the normal to prevent bouncing
 			velocity -= velocityAlongNormal;
 
 		}
 		else {
-			// Reflect the velocity around the collision normal for non-ground collisions
-			// First nullify the component of the velocity along the normal to handle energy dissipation
 			velocity -= velocityAlongNormal;
 
-			// Apply damping or restitution factor to simulate energy loss (optional)
-			float restitution = 0.8f; // Example restitution coefficient
+			float restitution = 0.8f; 
 			Vector3 reflectedVelocity = -velocityDotNormal * colNormal * restitution;
 
-			// Add the reflected velocity to the original velocity, considering damping
 			velocity += reflectedVelocity;
 
-			// Ensure velocity doesn't reverse in the direction of normal, just zero it out if necessary
 			if (velocity.dot(colNormal) < 0) {
 				velocity -= velocity.dot(colNormal) * colNormal;
 			}
@@ -204,7 +192,6 @@ void EntityPlayer::update(float delta_time)
 
 bool EntityPlayer::CheckPlayerCollision(const Vector3& target_pos, std::vector<sCollisionData>& collisions, float radius)
 {
-	//esto es horrible
 	Vector3 character_center;
 	if (radius == 0.6f) {
 		character_center = target_pos + Vector3(0.f, 1.0f, 0.f);
