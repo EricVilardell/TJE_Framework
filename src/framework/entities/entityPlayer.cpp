@@ -105,7 +105,7 @@ void EntityPlayer::update(float delta_time)
 		Mesh* mesh = em->mesh;
 		if (mesh->testRayCollision(em->model, center, Vector3(0, -1, 0), colPoint, colNormal, max_ray_dist, false)) {
 			is_grounded = true;
-			if (model.getTranslation().y >= 100.0f && model.getTranslation().y < 300.0f) {
+			if (model.getTranslation().y >= 10.0f && model.getTranslation().y < 300.0f) {
 				if (previously_grounded == false && airborne_time > 1.0f) {
 					HCHANNEL hellYea = Audio::Play("data/audio/hellYea.wav", 0.5f, false);
 					points += points_hidden;

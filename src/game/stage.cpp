@@ -7,6 +7,7 @@
 EntityUI* background_intro;
 EntityUI* background_lost;
 EntityUI* background_won;
+EntityUI* background_won_less250;
 EntityUI* play_button;
 EntityUI* play_button_win;
 EntityUI* exit_button;
@@ -222,7 +223,7 @@ void WinStage::render()
     background_won->render(World::get_instance()->camera2d);
     play_button_win->render(World::get_instance()->camera2d);
     exit_button_win->render(World::get_instance()->camera2d);
-    drawText(400, 215, message, Vector3(100, 100, 50), 7);
+    drawText(320, 180, message, Vector3(100, 100, 50), 6);
 }
 
 void WinStage::update(double seconds_elapsed)
@@ -269,8 +270,6 @@ void WinStage::onExit()
 {
 }
 
-
-
 WinStage_less250::WinStage_less250()
 {
     int width = Game::instance->window_width;
@@ -278,7 +277,7 @@ WinStage_less250::WinStage_less250()
 
     Material background_mat;
     background_mat.diffuse = Texture::Get("data/textures/background_won_250less.png");
-    background_won = new EntityUI(Vector2(width, height), Vector2(width, height), background_mat, "background");
+    background_won_less250 = new EntityUI(Vector2(width, height), Vector2(width, height), background_mat, "background");
     Material play_mat;
     play_mat.diffuse = Texture::Get("data/textures/playbutton.png");
     play_button_win = new EntityUI(Vector2(width - 250, 950), Vector2(240, 240), play_mat, "play");
@@ -296,10 +295,10 @@ WinStage_less250::WinStage_less250()
 void WinStage_less250::render()
 {
     std::string message = std::to_string(World::get_instance()->player->points);
-    background_won->render(World::get_instance()->camera2d);
+    background_won_less250->render(World::get_instance()->camera2d);
     play_button_win->render(World::get_instance()->camera2d);
     exit_button_win->render(World::get_instance()->camera2d);
-    drawText(400, 215, message, Vector3(100, 100, 50), 7);
+    drawText(320, 180, message, Vector3(100, 100, 50), 6);
 }
 
 void WinStage_less250::update(double seconds_elapsed)
