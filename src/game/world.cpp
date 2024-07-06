@@ -174,7 +174,7 @@ void World::update(float seconds_elapsed)
 	if (!end_game &&
 		player->model.getTranslation().x >= zone_min.x && player->model.getTranslation().x <= zone_max.x &&
 		player->model.getTranslation().z >= zone_min.z && player->model.getTranslation().z <= zone_max.z && 
-		player->points >= 250) { // Only checking x and z coordinates
+		player->points >= 250) {
 		std::cout << "Player entered the target zone with more than 250 points! Game over." << std::endl;
 		end_game = true;
 		Game::instance->currentStage->onExit();

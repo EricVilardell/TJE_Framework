@@ -200,7 +200,7 @@ WinStage::WinStage()
     int height = Game::instance->window_height;
 
     Material background_mat;
-    background_mat.diffuse = Texture::Get("data/textures/background_won.png");
+    background_mat.diffuse = Texture::Get("data/textures/background_won_250more.png");
     background_won = new EntityUI(Vector2(width, height), Vector2(width, height), background_mat, "background");
     Material play_mat;
     play_mat.diffuse = Texture::Get("data/textures/playbutton.png");
@@ -277,7 +277,7 @@ WinStage_less250::WinStage_less250()
     int height = Game::instance->window_height;
 
     Material background_mat;
-    background_mat.diffuse = Texture::Get("data/textures/background_won.png");
+    background_mat.diffuse = Texture::Get("data/textures/background_won_250less.png");
     background_won = new EntityUI(Vector2(width, height), Vector2(width, height), background_mat, "background");
     Material play_mat;
     play_mat.diffuse = Texture::Get("data/textures/playbutton.png");
